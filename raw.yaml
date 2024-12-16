@@ -1,0 +1,351 @@
+meta:
+  engine: 4.1.0
+units:
+  Mx: 14  #mounting hole width
+  My: 14  #mountign hole height
+  Sx: cx   #X spacing
+  Sy: cy   #Y spacing
+  Kx: Sx-.5  #keycap width
+  Ky: Sy-.5  #Keycap height
+  Pb: 3   #PCB buffer
+  bx: 0.5Sx + Pb
+  by: 0.5Sy + Pb
+
+points:
+  zones:
+    matrix:
+      anchor:
+        shift: [122, -100]
+      key:
+        spread: Sx
+        padding: Sy
+        width: Kx
+        height: Ky
+      columns:
+        outer:
+          key:
+            col_net: P4
+          rows:
+            mod.skip: true
+        pinky:
+          key:
+            col_net: P5
+          rows:
+            mod.skip: true
+        ring:
+          key:
+            stagger: 9
+            col_net: P6
+          rows:
+            mod.col_net: P5
+        middle:
+          key:
+            stagger: 2.5
+            col_net: P19
+          rows:
+            mod.col_net: P6
+        index:
+          key:
+            stagger: -2.5
+            col_net: P18
+          rows:
+            mod.col_net: P19
+        inner:
+          key:
+            stagger: -2.5
+            col_net: P15
+          rows:
+            mod.skip: true
+      rows:
+        mod:
+          row_net: P10
+          mirror.row_net: P9
+        bottom:
+          row_net: P16
+          mirror.row_net: P8
+        home:
+          row_net: P14
+          mirror.row_net: P7
+        top:
+          row_net: P20
+          mirror.row_net: P0
+        num:
+          row_net: P21
+          mirror.row_net: P1
+    thumbfan:
+      anchor:
+        ref: matrix_inner_mod
+        shift: [3, -2.25]
+      key:
+        spread: Sx
+        padding: Sy
+        width: Kx
+        height: Ky
+      columns:
+        select:
+          key:
+            splay: -23
+            col_net: P18
+        space:
+          key:
+            spread: 21.2
+            stagger: 3.5
+            splay: 83
+            width: 1.5Kx
+            col_net: P15
+      rows:
+        fan:
+          row_net: P10
+          mirror.row_net: P9
+  rotate: -25
+  mirror:
+    ref: matrix_inner_num
+    distance: 3U
+
+outlines:
+  keys:
+    - what: rectangle
+      where: true
+      asym: both
+      size: [Kx, Ky]
+    - what: rectangle
+      where: thumbfan_space_fan
+      asym: both
+      size: [1.5Kx, Ky]
+  key_holes:
+    - what: rectangle
+      where: true
+      size: [Mx, My]
+  basic:
+    - what: polygon
+      operation: stack
+      points:
+        - ref: matrix_outer_num
+          shift: [-bx, by]
+        - ref: matrix_outer_bottom
+          shift: [-bx, -by]
+        - ref: matrix_ring_mod
+          shift: [-bx, -by]
+        - ref: thumbfan_select_fan
+          shift: [-bx+3, -by]
+        - ref: thumbfan_select_fan
+          shift: [bx, -by]
+        - ref: thumbfan_space_fan
+          shift: [-bx-4, -by]
+        - ref: thumbfan_space_fan
+          shift: [bx, -by]
+        - ref: mirror_thumbfan_space_fan
+          shift: [bx, -by]
+        - ref: mirror_thumbfan_space_fan
+          shift: [-bx-4, -by]
+        - ref: mirror_thumbfan_select_fan
+          shift: [bx, -by]
+        - ref: mirror_thumbfan_select_fan
+          shift: [-bx+3,-by]
+        - ref: mirror_matrix_ring_mod
+          shift: [-bx, -by]       
+        - ref: mirror_matrix_outer_bottom
+          shift: [-bx, -by]          
+        - ref: mirror_matrix_outer_num
+          shift: [-bx, by]
+        - ref: mirror_matrix_ring_num
+          shift: [-bx, by]   
+        - ref: mirror_matrix_middle_num
+          shift: [-bx, by]                    
+        - ref: mirror_matrix_middle_num
+          shift: [bx, by]
+        - ref: mirror_matrix_inner_num
+          shift: [bx, by]
+        - ref: mirror_matrix_inner_top
+          shift: [bx, by]
+        - ref: matrix_inner_top
+          shift: [bx, by]
+        - ref: matrix_inner_num
+          shift: [bx, by]
+        - ref: matrix_middle_num
+          shift: [bx, by]
+        - ref: matrix_middle_num
+          shift: [-bx, by]
+        - ref: matrix_ring_num
+          shift: [-bx, by]
+      fillet: 3
+  preview:
+    - what: outline
+      name: basic
+    - what: outline
+      name: keys
+      operation: stack
+  mounting_plate:
+    - what: outline
+      name: basic
+    - what: outline
+      name: key_holes
+      operation: subtract
+
+pcbs:
+  choc:
+    template: kicad8
+    outlines:
+      - outline: basic
+        layer: Edge.Cuts
+    footprints:
+      keys:
+        what: ceoloide/switch_choc_v1_v2
+        where: true
+        params:
+          from: "{{col_net}}"
+          to: "{{colrow}}"
+          include_corner_marks: true
+          include_keycap: true
+          keycap_width: Kx
+          keycap_height: Ky
+          reversible: false
+          hotswap: true
+          choc_v2_support: false
+      diodes:
+        what: ceoloide/diode_tht_sod123
+        where: true
+        params:
+          from: "{{colrow}}"
+          to: "{{row_net}}"
+          side: B
+          reversible: false
+          include_thru_hole_smd_pads: false
+          include_traces_vias: true
+          trace_distance: 1.2
+          trace_width: 0.25
+          via_size: 0.8
+          via_drill: 0.4
+          include_tht: false
+          diode_3dmodel_filename: ''
+          diode_3dmodel_xyz_offset: [0, 0, 0]
+          diode_3dmodel_xyz_scale: [1, 1, 1]
+          diode_3dmodel_xyz_rotation: [0, 0, 0]
+        adjust:
+          rotate: 90
+          shift: [8.2475, -0.5]
+          resist: true
+      vias:
+        what: via
+        where: true
+        asym: both
+        params:
+          net: "{{row_net}}"
+        adjust:
+          shift: [8.2475, -4]
+          resist: true
+      via_inner:
+        what: via
+        where: 
+          ref: matrix_inner_home
+        params:
+          net: "{{col_net}}"
+        adjust:
+          shift: [-3.275, 0.5Sy+1]
+      via_index:
+        what: via
+        where: 
+          ref: matrix_index_home
+        params:
+          net: "{{col_net}}"
+        adjust:
+          shift: [-3.275, 0.5Sy+1]
+      via_middle:
+        what: via
+        where: 
+          ref: matrix_middle_home
+        params:
+          net: "{{col_net}}"
+        adjust:
+          shift: [-3.275, 0.5Sy+1]
+      via_ring:
+        what: via
+        where: 
+          ref: mirror_matrix_ring_home
+        params:
+          net: "{{col_net}}"
+        adjust:
+          shift: [3.275, 0.5Sy+1]
+      via_pinky:
+        what: via
+        where: 
+          ref: mirror_matrix_pinky_home
+        params:
+          net: "{{col_net}}"
+        adjust:
+          shift: [3.275, 0.5Sy+1]
+      via_outer:
+        what: via
+        where: 
+          ref: mirror_matrix_outer_home
+        params:
+          net: "{{col_net}}"
+        adjust:
+          shift: [3.275, 0.5Sy+1]
+      promicro:
+        what: promicro
+        params:
+          orientation: "down"
+        where:
+          ref.aggregate.parts: [matrix_inner_home, mirror_matrix_inner_home]
+          shift: [0,0]
+          rotate: -90
+      oled:
+        what: oled
+        params:
+          side: "F"
+          SDA: P2
+          SCL: P3
+        where:
+          ref.aggregate.parts: [matrix_inner_home, mirror_matrix_inner_home]
+          shift: [-6,-19]
+          rotate: 90
+      reset:
+        what: button
+        params:
+          from: GND
+          to: RST
+        where:
+          ref.aggregate.parts: [matrix_inner_home, mirror_matrix_inner_home]
+          shift: [0, -25]
+          rotate: -90
+      mtg_hole1:
+        what: infused-kim/mounting_hole
+        where:
+          ref: matrix_index_num
+          shift: [0.5Sx, -0.5Sy]
+      mtg_hole2:
+        what: infused-kim/mounting_hole
+        where:
+          ref: matrix_outer_num
+          shift: [0.5Sx, -0.5Sy]
+      mtg_hole3:
+        what: infused-kim/mounting_hole
+        where:
+          ref: matrix_outer_bottom
+          shift: [0.5Sx, 0.5Sy]
+      mtg_hole4:
+        what: infused-kim/mounting_hole
+        where:
+          ref: matrix_index_bottom
+          shift: [0.5Sx, -0.5Sy]
+      mtg_hole5:
+        what: infused-kim/mounting_hole
+        where:
+          ref: mirror_matrix_inner_bottom
+          shift: [-0.5Sx, -0.5Sy]          
+      mtg_hole6:
+        what: infused-kim/mounting_hole
+        where:
+          ref: mirror_matrix_outer_bottom
+          shift: [0.5Sx, 0.5Sy]          
+      mtg_hole7:
+        what: infused-kim/mounting_hole
+        where:
+          ref: mirror_matrix_outer_num
+          shift: [0.5Sx, -0.5Sy]
+      mtg_hole8:
+        what: infused-kim/mounting_hole
+        where:
+          ref: mirror_matrix_inner_num
+          shift: [-0.5Sx, -0.5Sy]
