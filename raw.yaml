@@ -223,7 +223,7 @@ pcbs:
           diode_3dmodel_xyz_rotation: [0, 0, 0]
         adjust:
           rotate: 90
-          shift: [8.2475, -0.5]
+          shift: [8.275, -0.5]
           resist: true
       vias:
         what: via
@@ -232,7 +232,7 @@ pcbs:
         params:
           net: "{{row_net}}"
         adjust:
-          shift: [8.2475, -4]
+          shift: [8.275, -4]
           resist: true
       via_inner:
         what: via
@@ -300,15 +300,18 @@ pcbs:
           ref.aggregate.parts: [matrix_inner_home, mirror_matrix_inner_home]
           shift: [-6,-19]
           rotate: 90
-      reset:
-        what: button
-        params:
-          from: GND
-          to: RST
+      reset_button:
+        what: ceoloide/reset_switch_tht_top
         where:
           ref.aggregate.parts: [matrix_inner_home, mirror_matrix_inner_home]
           shift: [0, -25]
-          rotate: -90
+          rotate: 180
+        params:
+          side: F
+          reversible: false
+          include_silkscreen: true
+          from: GND
+          to: RST
       mtg_hole1:
         what: infused-kim/mounting_hole
         where:
